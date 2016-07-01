@@ -2,6 +2,12 @@ GEM
   remote: https://rubygems.org/
   specs:
     coderay (1.1.1)
+    countries (1.2.5)
+      currencies (~> 0.4.2)
+      i18n_data (~> 0.7.0)
+    currencies (0.4.2)
+    going_postal (0.1.6)
+    i18n_data (0.7.0)
     method_source (0.8.2)
     mini_portile2 (2.1.0)
     nokogiri (1.6.8)
@@ -22,6 +28,8 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  countries
+  going_postal
   pry
   roo
 

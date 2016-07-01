@@ -1,3 +1,7 @@
+require 'roo'
+require 'countries'
+require 'going_postal'
+
 class Newsletter
   attr_reader :sheet_name, :file_path,
     :xls_columns,
@@ -31,6 +35,7 @@ class Newsletter
       sheet.each_with_index do |row, index|
         unless index.zero?
           row[:member_through] = row[:member_through].strftime('%b-%y')
+          row[:zip] = format_zipcode(row[:zip], row[:country])
         end
         csv << row.values.map do |value|
           clean_html(value)
@@ -40,6 +45,27 @@ class Newsletter
   end
 
   private
+
+  def country_alpha2(country)
+    return if country.nil?
+    cntry = ISO3166::Country.new(country) || ISO3166::Country.find_country_by_alpha3(country) || ISO3166::Country.find_country_by_name(country)
+    if cntry.nil?
+      puts "Invalid country: #{country}"
+      return country
+    end
+    cntry.alpha2
+  end
+
+  def format_zipcode(value, country)
+    return if value.nil?
+    country_alpha2 = country_alpha2(country)
+    postal = GoingPostal.postcode?(value, country_alpha2)
+    if postal === false
+      puts "Invalid postal code: #{value} for #{country}"
+      return value
+    end
+    postal
+  end
 
   def clean_html(value)
     return if value.nil?
