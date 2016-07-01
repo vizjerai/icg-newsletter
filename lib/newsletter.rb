@@ -59,8 +59,10 @@ class Newsletter
   def format_zipcode(value, country)
     return if value.nil?
     country_alpha2 = country_alpha2(country)
-    postal = GoingPostal.postcode?(value, country_alpha2)
-    if postal === false
+    puts "Missing country for postal code: #{value}" if country_alpha2.nil?
+
+    postal = GoingPostal.postcode?(value, country_alpha2 || 'US')
+    if postal == false
       puts "Invalid postal code: #{value} for #{country}"
       return value
     end
