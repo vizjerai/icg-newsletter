@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require './lib/newsletter.rb'
+
+newsletter = Newsletter.new(*ARGV)
+newsletter.generate
