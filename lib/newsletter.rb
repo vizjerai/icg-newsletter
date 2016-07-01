@@ -2,10 +2,26 @@ require 'roo'
 require 'countries'
 require 'going_postal'
 
+# Pulls out specific columns from the E-mail sheet for MailChimp
 class Newsletter
-  attr_reader :sheet_name, :file_path,
-    :xls_columns,
-    :output_path, :filename, :output_format
+  attr_reader :sheet_name,
+              :file_path,
+              :output_path,
+              :filename,
+              :output_format
+
+  XLS_COLUMNS = {
+    chapter: 'Chapter (Primary)',
+    member_through: 'Member Thru',
+    last_name: 'Last Name',
+    first_name: 'First Name',
+    address: 'Address',
+    city: 'City',
+    state: 'State',
+    zip: 'Zip',
+    country: 'Cntry',
+    email: 'Email'
+  }.freeze
 
   def initialize(file_path, filename = nil)
     @file_path = file_path
@@ -13,33 +29,17 @@ class Newsletter
     @output_format = 'csv'
     @output_path = 'output'
     @sheet_name = 'E-mail'
-    @xls_columns = {
-      chapter: 'Chapter (Primary)',
-      member_through: 'Member Thru',
-      last_name: 'Last Name',
-      first_name: 'First Name',
-      address: 'Address',
-      city: 'City',
-      state: 'State',
-      zip: 'Zip',
-      country: 'Cntry',
-      email: 'Email'
-    }
   end
 
   # Generate csv file with the specified columns
   def generate
-    require 'roo'
-
     CSV.open(output_filename, 'w') do |csv|
       sheet.each_with_index do |row, index|
         unless index.zero?
           row[:member_through] = row[:member_through].strftime('%b-%y')
           row[:zip] = format_zipcode(row[:zip], row[:country])
         end
-        csv << row.values.map do |value|
-          clean_html(value)
-        end
+        csv << row.values.map { |value| clean_html(value) }
       end
     end
   end
@@ -48,7 +48,9 @@ class Newsletter
 
   def country_alpha2(country)
     return if country.nil?
-    cntry = ISO3166::Country.new(country) || ISO3166::Country.find_country_by_alpha3(country) || ISO3166::Country.find_country_by_name(country)
+    cntry = ISO3166::Country.new(country) ||
+            ISO3166::Country.find_country_by_alpha3(country) ||
+            ISO3166::Country.find_country_by_name(country)
     if cntry.nil?
       puts "Invalid country: #{country}"
       return country
@@ -85,6 +87,6 @@ class Newsletter
     ::Roo::Spreadsheet
       .open(file_path, clean: true)
       .sheet(sheet_name)
-      .parse(xls_columns)
+      .parse(XLS_COLUMNS)
   end
 end
