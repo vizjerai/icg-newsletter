@@ -61,12 +61,16 @@ class Newsletter
     country_alpha2 = country_alpha2(country)
     puts "Missing country for postal code: #{value}" if country_alpha2.nil?
 
-    postal = GoingPostal.postcode?(value, country_alpha2 || 'US')
+    postal = postal_code_for(value, country_alpha2)
     if postal == false
       puts "Invalid postal code: #{value} for #{country} [#{country_alpha2}]"
       return value
     end
     postal
+  end
+
+  def postal_code_for(value, country_alpha2)
+    GoingPostal.postcode?(value, country_alpha2 || 'US')
   end
 
   def clean_html(value)
