@@ -62,11 +62,10 @@ class Newsletter
     puts "Missing country for postal code: #{value}" if country_alpha2.nil?
 
     postal = postal_code_for(value, country_alpha2)
-    if postal == false
-      puts "Invalid postal code: #{value} for #{country} [#{country_alpha2}]"
-      return value
-    end
-    postal
+    return postal if postal
+
+    puts "Invalid postal code: #{value} for #{country} [#{country_alpha2}]"
+    value
   end
 
   def postal_code_for(value, country_alpha2)
