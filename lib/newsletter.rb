@@ -63,7 +63,7 @@ class Newsletter
 
     postal = GoingPostal.postcode?(value, country_alpha2 || 'US')
     if postal == false
-      puts "Invalid postal code: #{value} for #{country}"
+      puts "Invalid postal code: #{value} for #{country} [#{country_alpha2}]"
       return value
     end
     postal
