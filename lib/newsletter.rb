@@ -10,6 +10,8 @@ class Newsletter
               :filename,
               :output_format
 
+  DEFAULT_COUNTRY = 'US'.freeze
+
   XLS_COLUMNS = {
     chapter: 'Chapter (Primary)',
     member_through: 'Member Thru',
@@ -61,7 +63,7 @@ class Newsletter
   def format_zipcode(value, country)
     return if value.nil?
     country_alpha2 = country_alpha2(country)
-    puts "Missing country for postal code: #{value}" if country_alpha2.nil?
+    puts "Defaulting Country to #{DEFAULT_COUNTRY} for postal code: #{value}" if country_alpha2.nil?
 
     postal = postal_code_for(value, country_alpha2)
     return postal if postal
@@ -71,7 +73,7 @@ class Newsletter
   end
 
   def postal_code_for(value, country_alpha2)
-    GoingPostal.postcode?(value, country_alpha2 || 'US')
+    GoingPostal.postcode?(value, country_alpha2 || DEFAULT_COUNTRY)
   end
 
   def clean_html(value)
