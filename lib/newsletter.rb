@@ -53,7 +53,7 @@ class Newsletter
   def past_due?(date)
     return false if @send_past_due == true
     today = Date.today
-    date < (Date.new(today.year, today.month, 1) - 1)
+    date < Date.new(today.year, today.month - 1, 1)
   end
 
   def country_alpha2(country)

@@ -6,6 +6,7 @@ describe Newsletter do
     let(:newsletter) { Newsletter.new('') }
 
     [
+      Date.new(2016, 9, 1),
       Date.new(2016, 9, 30),
       Date.new(2016, 10, 31),
       Date.new(2017, 3, 31)
@@ -18,7 +19,7 @@ describe Newsletter do
     end
 
     [
-      Date.new(2016, 9, 29),
+      Date.new(2016, 8, 1),
       Date.new(2016, 8, 31)
     ].each do |date|
       it "#{date} to be past due" do
