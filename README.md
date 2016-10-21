@@ -8,5 +8,5 @@ This parses the mailing list to clean up some of the formatting for zip codes an
 
 ## Output
 
-1.  `output/<filename>.cvs`
+1.  `output/<filename>.csv`
 
