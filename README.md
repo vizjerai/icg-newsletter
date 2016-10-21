@@ -4,4 +4,9 @@ This parses the mailing list to clean up some of the formatting for zip codes an
 
 ## Usage
 
-1.  `bin/newsletter <filename>`
+1.  `bin/newsletter <filename>.xlsx`
+
+## Output
+
+1.  `output/<filename>.cvs`
+
