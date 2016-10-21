@@ -6,3 +6,7 @@ gem 'going_postal'
 
 # for debugging
 gem 'pry'
+
+# tests
+gem 'rspec'
+gem 'timecop'
