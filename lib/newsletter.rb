@@ -30,7 +30,8 @@ class Newsletter
     @filename = filename || File.basename(file_path, File.extname(file_path))
     @output_format = 'csv'
     @output_path = 'output'
-    @sheet_name = 'E-mail'
+    @sheet_name = 'Electronic' # 'E-mail'
+    @send_past_due = false
   end
 
   # Generate csv file with the specified columns
@@ -38,6 +39,7 @@ class Newsletter
     CSV.open(output_filename, 'w') do |csv|
       sheet.each_with_index do |row, index|
         unless index.zero?
+          next if past_due?(row[:member_through])
           row[:member_through] = row[:member_through].strftime('%b-%y')
           row[:zip] = format_zipcode(row[:zip], row[:country])
         end
@@ -47,6 +49,12 @@ class Newsletter
   end
 
   private
+
+  def past_due?(date)
+    return false if @send_past_due == true
+    today = Date.today
+    date < (Date.new(today.year, today.month, 1) - 1)
+  end
 
   def country_alpha2(country)
     return if country.nil?
