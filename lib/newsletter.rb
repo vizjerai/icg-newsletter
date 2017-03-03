@@ -30,8 +30,8 @@ class Newsletter
     @filename = filename || File.basename(file_path, File.extname(file_path))
     @output_format = 'csv'
     @output_path = 'output'
-    @sheet_name = 'Electronic' # 'E-mail'
-    @send_past_due = false
+    @sheet_name = 'E-Mail' # 'E-mail', 'Electronic'
+    @send_past_due = true
   end
 
   # Generate csv file with the specified columns
