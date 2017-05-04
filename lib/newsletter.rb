@@ -40,6 +40,11 @@ class Newsletter
       sheet.each_with_index do |row, index|
         unless index.zero?
           next if past_due?(row[:member_through])
+          unless row[:member_through].respond_to?(:strftime)
+            new_date = Date.parse("01-#{row[:member_through]}")
+            puts "Correcting date: #{row[:member_through]} to #{new_date.strftime('%b-%y')}"
+            row[:member_through] = new_date
+          end
           row[:member_through] = row[:member_through].strftime('%b-%y')
           row[:zip] = format_zipcode(row[:zip], row[:country])
         end
