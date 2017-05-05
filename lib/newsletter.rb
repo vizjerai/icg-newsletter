@@ -4,7 +4,7 @@ require 'going_postal'
 
 # Pulls out specific columns from the E-mail sheet for MailChimp
 class Newsletter
-  attr_reader :sheet_name,
+  attr_reader :sheet_names,
               :file_path,
               :output_path,
               :filename,
@@ -30,39 +30,41 @@ class Newsletter
     @filename = filename || File.basename(file_path, File.extname(file_path))
     @output_format = 'csv'
     @output_path = 'output'
-    @sheet_name = 'E-Mail' # 'E-mail', 'Electronic'
+    @sheet_names = ['E-Mail', 'E-mail', 'Electronic']
     @send_past_due = true
   end
 
   # Generate csv file with the specified columns
   def generate
     CSV.open(output_filename, 'w') do |csv|
-      sheet.each_with_index do |row, index|
-        next if index.zero?
-        unless row[:email].respond_to?(:split)
-          puts "Email skipped because it is empty"
-          next
-        end
-
-        original_email = row[:email].dup
-        original_email.split.each do |email|
-          next if past_due?(row[:member_through])
-          puts "Email reformatted from: [#{original_email}] to [#{email}]" if email != row[:email]
-          unless valid_email?(email)
-            puts "Email invalid: #{email}"
+      sheet_names.each do |sheet_name|
+        sheet(sheet_name).each_with_index do |row, index|
+          next if index.zero?
+          unless row[:email].respond_to?(:split)
+            puts "Email skipped because it is empty"
             next
           end
-          row[:email] = email
 
-          unless row[:member_through].respond_to?(:strftime)
-            new_date = Date.parse("01-#{row[:member_through]}")
-            puts "Correcting date: #{row[:member_through]} to #{new_date.strftime('%b-%y')}"
-            row[:member_through] = new_date
+          original_email = row[:email].dup
+          original_email.split.each do |email|
+            next if past_due?(row[:member_through])
+            puts "Email reformatted from: [#{original_email}] to [#{email}]" if email != row[:email]
+            unless valid_email?(email)
+              puts "Email invalid: #{email}"
+              next
+            end
+            row[:email] = email
+
+            unless row[:member_through].respond_to?(:strftime)
+              new_date = Date.parse("01-#{row[:member_through]}")
+              puts "Correcting date: #{row[:member_through]} to #{new_date.strftime('%b-%y')}"
+              row[:member_through] = new_date
+            end
+            row[:member_through] = row[:member_through].strftime('%b-%y')
+            row[:zip] = format_zipcode(row[:zip], row[:country])
+
+            csv << row.values.map { |value| clean_html(value) }
           end
-          row[:member_through] = row[:member_through].strftime('%b-%y')
-          row[:zip] = format_zipcode(row[:zip], row[:country])
-
-          csv << row.values.map { |value| clean_html(value) }
         end
       end
     end
@@ -119,10 +121,13 @@ class Newsletter
     File.join(output_path, "#{filename}.#{output_format}")
   end
 
-  def sheet
+  def sheet(sheet_name)
     ::Roo::Spreadsheet
       .open(file_path, clean: true)
       .sheet(sheet_name)
       .parse(XLS_COLUMNS)
+  rescue RangeError => e
+    puts "Failed to open #{sheet_name}: #{e.message}"
+    []
   end
 end
