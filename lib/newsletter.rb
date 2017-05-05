@@ -38,8 +38,22 @@ class Newsletter
   def generate
     CSV.open(output_filename, 'w') do |csv|
       sheet.each_with_index do |row, index|
-        unless index.zero?
+        next if index.zero?
+        unless row[:email].respond_to?(:split)
+          puts "Email skipped because it is empty"
+          next
+        end
+
+        original_email = row[:email].dup
+        original_email.split.each do |email|
           next if past_due?(row[:member_through])
+          puts "Email reformatted from: [#{original_email}] to [#{email}]" if email != row[:email]
+          unless valid_email?(email)
+            puts "Email invalid: #{email}"
+            next
+          end
+          row[:email] = email
+
           unless row[:member_through].respond_to?(:strftime)
             new_date = Date.parse("01-#{row[:member_through]}")
             puts "Correcting date: #{row[:member_through]} to #{new_date.strftime('%b-%y')}"
@@ -47,8 +61,9 @@ class Newsletter
           end
           row[:member_through] = row[:member_through].strftime('%b-%y')
           row[:zip] = format_zipcode(row[:zip], row[:country])
+
+          csv << row.values.map { |value| clean_html(value) }
         end
-        csv << row.values.map { |value| clean_html(value) }
       end
     end
   end
@@ -59,6 +74,12 @@ class Newsletter
     return false if @send_past_due == true
     today = Date.today
     date < Date.new(today.year, today.month - 1, 1)
+  end
+
+  # true if it contains an @ symbol
+  def valid_email?(email)
+    return false if email.nil? || email.empty?
+    email.include?('@')
   end
 
   def country_alpha2(country)
