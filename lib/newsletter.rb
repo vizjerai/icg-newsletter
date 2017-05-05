@@ -39,7 +39,11 @@ class Newsletter
     CSV.open(output_filename, 'w') do |csv|
       sheet_names.each do |sheet_name|
         sheet(sheet_name).each_with_index do |row, index|
-          next if index.zero?
+          if index.zero?
+            # headers
+            csv << row.values.map { |value| clean_html(value) }
+            next
+          end
           unless row[:email].respond_to?(:split)
             puts "Email skipped because it is empty"
             next
