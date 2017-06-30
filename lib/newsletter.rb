@@ -82,10 +82,10 @@ class Newsletter
     date < Date.new(today.year, today.month - 1, 1)
   end
 
-  # true if it contains an @ symbol
+  # true if it contains an @ symbol and . after the @ symbol
   def valid_email?(email)
     return false if email.nil? || email.empty?
-    email.include?('@')
+    email.include?('@') && email.split('@')[1].include?('.')
   end
 
   def country_alpha2(country)
