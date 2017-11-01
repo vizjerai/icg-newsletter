@@ -30,7 +30,7 @@ class Newsletter
     @filename = filename || File.basename(file_path, File.extname(file_path))
     @output_format = 'csv'
     @output_path = 'output'
-    @sheet_names = ['E-Mail', 'E-mail', 'Electronic']
+    @sheet_names = ['Email', 'E-Mail', 'E-mail', 'Electronic']
     @send_past_due = true
   end
 
