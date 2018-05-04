@@ -40,9 +40,8 @@ class Newsletter
       sheet_names.each do |sheet_name|
         sheet(sheet_name).each_with_index do |row, index|
           if index.zero?
-            # headers
-            csv << row.values.map { |value| clean_html(value) }
-            next
+            # headers, restore original column name
+            csv << row.keys.map { |value| XLS_COLUMNS[value] }
           end
           unless row[:email].respond_to?(:split)
             puts "Email skipped because it is empty"
