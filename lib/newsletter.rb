@@ -21,7 +21,7 @@ class Newsletter
     city: 'City',
     state: 'State',
     zip: 'Zip',
-    country: 'Cntry',
+    country: 'Country',
     email: 'Email'
   }.freeze
 
